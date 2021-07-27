@@ -28,7 +28,8 @@ int main(int argc, const char* argv[]) {
     0,1,1,2,3,3,2,3,1,2
   };
   int selected = 0;
-  auto tree = DirTree(entries, depths, selected);
+  std::vector<ConstStringRef> labels = {{L"OptionA"}, {L"optionB"}};
+  auto tree = DirTree(entries, depths, selected, labels);
   screen.Loop(tree);
 
   return 0;

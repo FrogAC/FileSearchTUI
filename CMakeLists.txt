@@ -24,7 +24,7 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 # ------------------------------------------------------------------------------
 
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 11)
 
 project(fstui
   LANGUAGES CXX

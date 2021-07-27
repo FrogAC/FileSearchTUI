@@ -8,10 +8,16 @@
 namespace fstui{
 using namespace ftxui;
 
-Component DirTree(std::vector<std::wstring>& entries,
-                  std::vector<short>& depths,
-                  int& selected,
-                  Ref<MenuOption> option = {});
+Component DirTree(std::vector<std::wstring> &entries,
+                  std::vector<short> &depths,
+                  int &selected,
+                  std::vector<ConstStringRef> &itemLabels,
+                  Ref<MenuOption> menuOption = {},
+                  Ref<CheckboxOption> checkboxOption = {});
+
+//bool LoadDirTree(std::vector<std::wstring>* entries,
+//                 std::vector<short>* depths,
+//                 int* selected)
 
 } // fstui
 

@@ -18,4 +18,4 @@ target_link_libraries(fstui
   PRIVATE ftxui::component
 )
 
-# install(TARGETS fstui RUNTIME DESTINATION "bin")
+install(TARGETS fstui RUNTIME DESTINATION "bin")
