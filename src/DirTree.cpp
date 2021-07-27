@@ -69,8 +69,8 @@ public:
       // ftxui States
       if (!CaptureMouse(event))
         return false;
-//      if (event.is_mouse())
-//        return OnMouseEvent(event);
+      if (event.is_mouse())
+        return OnMouseEvent(event);
       if (!Focused())
         return false;
 
@@ -152,6 +152,26 @@ public:
       return true;
     }
 
+    bool OnMouseEvent(Event event) {
+      if (!CaptureMouse(event))
+        return false;
+      for (int i = 0; i < int(boxes_.size()); ++i) {
+        if (!boxes_[i].Contain(event.mouse().x, event.mouse().y))
+          continue;
+
+        TakeFocus();
+        if (event.mouse().button == Mouse::Left &&
+            event.mouse().motion == Mouse::Released) {
+          if (focused_ != i) {
+            if (state_ == States::SELECTED || state_ == States::EDITING) MoveEntry(focused_, i);
+            MoveFocus(i);
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
     void MoveFocus(int dstId) {
       auto old_selected = focused_;
 
@@ -175,11 +195,6 @@ public:
       std::iter_swap(entries_.begin()+srcId, entries_.begin()+ dstId);
       std::iter_swap(depths_.begin()+srcId, depths_.begin()+ dstId);
       std::iter_swap(prefixs_.begin()+srcId, prefixs_.begin()+ dstId);
-//      // recalc depth
-//      depths_.at(dstId) = dstId == 0 ? 0 : std::min(depths_.at(dstId), (short)(1+depths_.at(dstId -1)));
-//      depths_.at(srcId) = srcId == 0 ? 0 : std::min(depths_.at(srcId), (short)(1+depths_.at(srcId-1)));
-      // reacalc prefix
-//      UpdatePrefixsAndDepths();
     }
 
     void RemoveEntry(int tgtId) {
