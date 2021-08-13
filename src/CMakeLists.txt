@@ -10,7 +10,7 @@ CPMAddPackage(
 )
 # ------------------------------------------------------------------------------
 
-add_executable(fstui main.cpp DirTree.cpp)
+add_executable(fstui main.cpp DirTreeBase.cpp PresetsBase.cpp)
 
 target_link_libraries(fstui
   PRIVATE ftxui::screen
