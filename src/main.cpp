@@ -56,8 +56,7 @@ int main(int argc, const char* argv[]) {
 //      file.close();
 //    }
 
-    tree->UpdatePrefixsAndDepths();
-    tree->Render();
+    tree->Init();
   };
 
   auto preset = std::make_shared<PresetsBase>("presets", "Search");

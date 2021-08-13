@@ -22,31 +22,39 @@
 namespace fstui {
   using namespace ftxui;
 
-
   DirTreeBase::DirTreeBase(std::vector<std::wstring> &entries,
-              std::vector<short> &depths,
-              int &selected,
-              std::vector<ConstStringRef> &itemLabels,
-              std::string windowName,
-              Ref<MenuOption> menuOption,
-              Ref<CheckboxOption> checkboxOption)
+                           std::vector<short> &depths,
+                           int &selected,
+                           std::vector<ConstStringRef> &itemLabels,
+                           std::string windowName,
+                           Ref<MenuOption> menuOption,
+                           Ref<CheckboxOption> checkboxOption)
       : entries_(entries), depths_(depths), focused_(selected),
-        labels_(itemLabels), windowName_(windowName),
+        labels_(itemLabels), windowName_(windowName.begin(), windowName.end()),
         menuOption_(std::move(menuOption)), checkboxOption_(std::move(checkboxOption)) {
+    Init();
+    // force checkbox style
+    checkboxOption_->style_checked = L"[X]";
+    checkboxOption_->style_unchecked = L"[ ]";
+  }
+
+  void DirTreeBase::Init() {
+    // AT LEASET ONE ELEMENT
+    if (entries_.empty()) {
+      entries_ = {L"Directory"};
+      depths_ = {0};
+      labels_ = std::vector<ConstStringRef>({"Option"});
+      focused_ = 0;
+    }
     UpdatePrefixsAndDepths();
     state_ = States::FOCUSED;
     isLabelsFocused_ = false;
     labelBoxes_.resize(labels_.size());
     labelFocused_ = 0;
     labelChecked_ = std::vector<std::vector<bool>>(entries_.size(), std::vector<bool>(labels_.size(), false));
-    // force checkbox style
-    checkboxOption_->style_checked = L"[X]";
-    checkboxOption_->style_unchecked = L"[ ]";
   }
 
   Element DirTreeBase::Render() {
-    UpdatePrefixsAndDepths();// TODO better performance
-
     Elements elements;
     bool is_menu_focused = Focused();
     treeBoxes_.resize(entries_.size());
@@ -104,7 +112,7 @@ namespace fstui {
     //      }
 
     return window(
-            text(L"Directory"),
+            text(windowName_),
             hbox({border(vbox(std::move(elements))),
                   vbox(std::move(arrows)),
                   border(vbox(std::move(labels)))}));
@@ -293,8 +301,6 @@ namespace fstui {
   }
 
   void DirTreeBase::MoveEntry(int srcId, int dstId) {
-    if (entries_.size() == 0) return;
-
     dstId = (dstId + entries_.size()) % entries_.size();
     // swap
     std::iter_swap(entries_.begin() + srcId, entries_.begin() + dstId);
@@ -317,9 +323,7 @@ namespace fstui {
   }
 
   void DirTreeBase::MoveDepth(int entryId, short depth) {
-    if (entries_.size() == 0) return;
-
-    depths_[entryId] = depth;
+    depths_[entryId] = depth > 0 ? depth : 0;
     UpdatePrefixsAndDepths(false);
   }
 
@@ -339,6 +343,7 @@ namespace fstui {
   void DirTreeBase::UpdatePrefixsAndDepths(bool formatDepth) {
     // depths
     if (formatDepth) {
+      depths_[0] = 0;
       for (auto it = depths_.begin() + 1; it < depths_.end(); it++) {
         if (*it > 1 + *(it - 1)) *it = 1 + *(it - 1);
       }
@@ -347,7 +352,7 @@ namespace fstui {
     // prefixs
     prefixs_ = std::vector<std::wstring>(entries_.size());
 
-    std::vector<bool> depthVisible(*std::max_element(depths_.begin(), depths_.end()),
+    std::vector<bool> depthVisible(*std::max_element(depths_.begin(), depths_.end()) + 1,
                                    false);
 
     auto nextDepth = depths_.back();
