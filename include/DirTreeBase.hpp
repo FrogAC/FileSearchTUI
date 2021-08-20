@@ -17,7 +17,8 @@ public:
     DirTreeBase(std::vector<std::wstring> &entries,
                 std::vector<short> &depths,
                 int &selected,
-                std::vector<ConstStringRef> &itemLabels,
+                std::vector<ConstStringRef> &labels,
+                std::vector<std::vector<bool>> &labelChecks,
                 std::string windowName,
                 Ref<MenuOption> menuOption = {},
                 Ref<CheckboxOption> checkboxOption = {});
@@ -44,11 +45,9 @@ private:
     std::wstring inputString_;
     int inputPosition_;
 
-    // PRESETS
-
     // LABEL CHECKBOXES
     std::vector<ConstStringRef> &labels_;
-    std::vector<std::vector<bool>> labelChecked_;
+    std::vector<std::vector<bool>> &labelChecked_;
     std::vector<Box> labelBoxes_;
     int labelFocused_;
     Ref<CheckboxOption> checkboxOption_;

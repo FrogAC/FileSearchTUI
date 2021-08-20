@@ -25,12 +25,13 @@ namespace fstui {
   DirTreeBase::DirTreeBase(std::vector<std::wstring> &entries,
                            std::vector<short> &depths,
                            int &selected,
-                           std::vector<ConstStringRef> &itemLabels,
-                           std::string windowName,
+                           std::vector<ConstStringRef> &labels,
+                           std::vector<std::vector<bool>> &labelChecks,
+                           const std::string windowName,
                            Ref<MenuOption> menuOption,
                            Ref<CheckboxOption> checkboxOption)
       : entries_(entries), depths_(depths), focused_(selected),
-        labels_(itemLabels), windowName_(windowName.begin(), windowName.end()),
+        labels_(labels), labelChecked_(labelChecks), windowName_(windowName.begin(), windowName.end()),
         menuOption_(std::move(menuOption)), checkboxOption_(std::move(checkboxOption)) {
     Init();
     // force checkbox style
@@ -45,13 +46,13 @@ namespace fstui {
       depths_ = {0};
       labels_ = std::vector<ConstStringRef>({"Option"});
       focused_ = 0;
+      labelChecked_ = std::vector<std::vector<bool>>(entries_.size(), std::vector<bool>(labels_.size(), false));
     }
     UpdatePrefixsAndDepths();
     state_ = States::FOCUSED;
     isLabelsFocused_ = false;
     labelBoxes_.resize(labels_.size());
     labelFocused_ = 0;
-    labelChecked_ = std::vector<std::vector<bool>>(entries_.size(), std::vector<bool>(labels_.size(), false));
   }
 
   Element DirTreeBase::Render() {
@@ -60,7 +61,7 @@ namespace fstui {
     treeBoxes_.resize(entries_.size());
     for (int i = 0; i < entries_.size(); i++) {
       bool is_selected = (focused_entry() == int(i)) && is_menu_focused && state_ == States::SELECTED;
-      bool is_focused = (focused_ == int(i));
+      bool is_focused = (focused_ == int(i)) && is_menu_focused && !isLabelsFocused_;
 
       auto style = is_focused ? (is_selected ? menuOption_->style_selected_focused
                                              : menuOption_->style_selected)
@@ -111,15 +112,20 @@ namespace fstui {
     }
     //      }
 
-    return window(
-            text(windowName_),
-            hbox({border(vbox(std::move(elements))),
-                  vbox(std::move(arrows)),
-                  border(vbox(std::move(labels)))}));
+    if (labels_.size() > 0)
+      return window(
+              text(windowName_),
+              hbox(
+                      {border(vbox(std::move(elements))),
+                       vbox(std::move(arrows)),
+                       border(vbox(std::move(labels)))}));
+    else
+      return window(
+              text(windowName_),
+              hbox({border(vbox(std::move(elements)))}));
   }
 
   bool DirTreeBase::OnEvent(Event event) {
-    // ftxui States
     if (!CaptureMouse(event))
       return false;
     if (event.is_mouse())
@@ -141,12 +147,12 @@ namespace fstui {
           else
             MoveFocus(focused_ - 1);
         } else if (event == Event::ArrowRight) {
-          if (!isLabelsFocused_)
+          if (!isLabelsFocused_ && labels_.size() > 0)
             isLabelsFocused_ = true;
           else
             return false;// fallback to container
         } else if (event == Event::ArrowLeft) {
-          if (isLabelsFocused_)
+          if (isLabelsFocused_ )
             isLabelsFocused_ = false;
           else
             return false;// fallback to container
@@ -376,6 +382,4 @@ namespace fstui {
       }
     }
   }
-
-
 }// namespace fstui
