@@ -88,15 +88,14 @@ namespace fstui {
     if (state_ == States::EDITSAVENAME || state_ == States::SAVENAME) savename = savename | inverted;
     savename = hbox(text(L"Name: ") | vcenter, border(savename | reflect(nameBox_)));
     // action btn
-    Element actionbtn = border(text(actionName_) | center | (state_ == States::ACTIONBTN ? inverted : nothing)) | hcenter;
-    actionbtn = actionbtn | reflect(actionbtnBox_);
+//    Element actionbtn = border(text(actionName_) | center | (state_ == States::ACTIONBTN ? inverted : nothing)) | hcenter;
+//    actionbtn = actionbtn | reflect(actionbtnBox_);
 
     return window(
             text(windowName_),
             vbox(
                     {vbox(std::move(elements)),
-                     savename,
-                     actionbtn}));
+                     savename}));
   }
 
   bool PresetsBase::OnEvent(Event event) {
@@ -132,8 +131,8 @@ namespace fstui {
           inputPosition_ = inputString_.size();
         } else if (event == Event::ArrowUp) {
           state_ = States::PRESETS;
-        } else if (event == Event::ArrowDown) {
-          state_ = States::ACTIONBTN;
+//        } else if (event == Event::ArrowDown) {
+//          state_ = States::ACTIONBTN;
         } else {
           return false;
         }
@@ -233,15 +232,15 @@ namespace fstui {
       }
     }
     // actionbtn
-    if (actionbtnBox_.Contain(event.mouse().x, event.mouse().y)) {
-      TakeFocus();
-      if (event.mouse().button == Mouse::Left &&
-          event.mouse().motion == Mouse::Released) {
-        state_ = States::ACTIONBTN;
-        onAction_(presetPaths_[selected_]);
-        return true;
-      }
-    }
+//    if (actionbtnBox_.Contain(event.mouse().x, event.mouse().y)) {
+//      TakeFocus();
+//      if (event.mouse().button == Mouse::Left &&
+//          event.mouse().motion == Mouse::Released) {
+//        state_ = States::ACTIONBTN;
+//        onAction_(presetPaths_[selected_]);
+//        return true;
+//      }
+//    }
     return false;
   }
 

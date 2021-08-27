@@ -89,7 +89,7 @@ namespace fstui {
     Elements labels;
     Elements arrows;
     //      if (state_ == States::FOCUSED) {
-    int padding = std::min(focused_, (int) (entries_.size() - labels_.size()));
+    int padding = std::min(focused_, std::max(0, (int) (entries_.size() - labels_.size())));
     // space before
     for (int i = 0; i < padding; i++) {
       labels.emplace_back(text(L""));
